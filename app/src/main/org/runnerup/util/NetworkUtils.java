@@ -2,13 +2,19 @@ package org.runnerup.util;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
+import android.net.Network;
+import android.net.NetworkCapabilities;
 
 public class NetworkUtils {
   public static boolean isNetworkAvailable(Context context) {
     ConnectivityManager cm =
         (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-    NetworkInfo netInfo = cm.getActiveNetworkInfo();
-    return netInfo != null && netInfo.isConnectedOrConnecting();
+    Network network = cm.getActiveNetwork();
+    if (network == null) return false;
+    NetworkCapabilities caps = cm.getNetworkCapabilities(network);
+    return caps != null
+        && (caps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)
+            || caps.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)
+            || caps.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET));
   }
 }
